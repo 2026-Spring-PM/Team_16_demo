@@ -66,7 +66,18 @@ docker run --rm -it \
     rm -rf /var/lib/apt/lists/*
 
     Xvfb :99 -screen 0 1280x800x24 &
+    
+    # Wait for Xvfb socket to be created
+    for i in {1..30}; do
+      if [ -S /tmp/.X11-unix/X99 ]; then
+        break
+      fi
+      sleep 0.2
+    done
     sleep 1
+
+    export SDL_VIDEODRIVER=x11
+    export XDG_RUNTIME_DIR=/tmp
 
     openbox &
     x11vnc -display :99 -forever -shared -rfbport 5900 -nopw &
